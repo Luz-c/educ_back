@@ -1,0 +1,266 @@
+/**
+ * Modèles Mongoose pour la plateforme d'évaluations en ligne
+ * Version Mongoose des modèles définis dans shared/schema.ts
+ */
+
+const mongoose = require('mongoose');
+const { Schema } = mongoose;
+
+// Constantes pour les énumérations
+const UserRole = {
+  TEACHER: "teacher",
+  STUDENT: "student",
+};
+
+const QuestionType = {
+  QCM: "qcm",
+  ESSAY: "essay",
+  NUMERIC: "numeric", 
+  IMAGE: "image",
+};
+
+const AssessmentStatus = {
+  DRAFT: "draft",
+  PUBLISHED: "published",
+  COMPLETED: "completed",
+  GRADED: "graded",
+};
+
+// Schéma pour les options des questions QCM
+const QuestionOptionSchema = new Schema({
+  id: { type: String, required: true },
+  text: { type: String, required: true },
+  correct: { type: Boolean, required: true }
+}, { _id: false });
+
+// Schéma Utilisateur
+const UserSchema = new Schema({
+  username: { 
+    type: String, 
+    required: true, 
+    unique: true 
+  },
+  password: { 
+    type: String, 
+    required: true 
+  },
+  email: { 
+    type: String, 
+    required: true, 
+    unique: true 
+  },
+  name: { 
+    type: String, 
+    required: true 
+  },
+  role: { 
+    type: String, 
+    required: true, 
+    enum: Object.values(UserRole) 
+  },
+  class: { 
+    type: String, 
+    default: null 
+  },
+  createdAt: { 
+    type: Date, 
+    default: Date.now 
+  }
+});
+
+// Schéma Évaluation
+const AssessmentSchema = new Schema({
+  title: { 
+    type: String, 
+    required: true 
+  },
+  description: { 
+    type: String 
+  },
+  teacherId: { 
+    type: Schema.Types.ObjectId, 
+    ref: 'User', 
+    required: true 
+  },
+  class: { 
+    type: String, 
+    required: true 
+  },
+  type: { 
+    type: String, 
+    required: true 
+  },
+  duration: { 
+    type: Number, 
+    required: true 
+    type: Number, 
+  date: { 
+    type: Date, 
+    required: true 
+  },
+  status: { 
+    type: String, 
+    required: true, 
+    enum: Object.values(AssessmentStatus), 
+    default: AssessmentStatus.DRAFT 
+  },
+  blockCopyPaste: { 
+    type: Boolean, 
+    default: true 
+  },
+  autoFinish: { 
+    type: Boolean, 
+    default: true 
+  },
+  shuffleQuestions: { 
+    type: Boolean, 
+    default: false 
+  },
+  ipRestriction: { 
+    type: Boolean, 
+    default: false 
+  },
+  createdAt: { 
+    type: Date, 
+    default: Date.now 
+  }
+});
+
+// Schéma Question
+const QuestionSchema = new Schema({
+  assessmentId: { 
+    type: Schema.Types.ObjectId, 
+    ref: 'Assessment', 
+    required: true 
+  },
+  type: { 
+    type: String, 
+    required: true, 
+    enum: Object.values(QuestionType) 
+  },
+  content: { 
+    type: String, 
+    required: true 
+  },
+  points: { 
+    type: Number, 
+    required: true 
+  },
+  options: [QuestionOptionSchema], // Pour les questions QCM
+  correctAnswer: { 
+    type: String 
+  }, // Pour les questions numériques
+  minWordCount: { 
+    type: Number 
+  }, // Pour les questions de rédaction
+  orderIndex: { 
+    type: Number, 
+    required: true 
+  }
+});
+
+// Schéma Assignation d'évaluation à un étudiant
+const StudentAssessmentSchema = new Schema({
+  studentId: { 
+    type: Schema.Types.ObjectId, 
+    ref: 'User', 
+    required: true 
+  },
+  assessmentId: { 
+    type: Schema.Types.ObjectId, 
+    ref: 'Assessment', 
+    required: true 
+  },
+  uniqueId: { 
+    type: String, 
+    required: true, 
+    unique: true 
+  },
+  status: { 
+    type: String, 
+    required: true, 
+    enum: ['not_started', 'in_progress', 'completed'], 
+    default: 'not_started' 
+  },
+  startTime: { 
+    type: Date 
+  },
+  endTime: { 
+    type: Date 
+  },
+  timeSpent: { 
+    type: Number 
+  }, // en secondes
+  score: { 
+    type: Number 
+  },
+  maxScore: { 
+    type: Number, 
+    required: true 
+  }
+});
+
+// Schéma Réponse d'un étudiant
+const StudentAnswerSchema = new Schema({
+  studentAssessmentId: { 
+    type: Schema.Types.ObjectId, 
+    ref: 'StudentAssessment', 
+    required: true 
+  },
+  questionId: { 
+    type: Schema.Types.ObjectId, 
+    ref: 'Question', 
+    required: true 
+  },
+  answer: { 
+    type: String 
+  },
+  answerOption: { 
+    type: String 
+  }, // Pour les QCM
+  isCorrect: { 
+    type: Boolean 
+  },
+  score: { 
+    type: Number 
+  },
+  maxScore: { 
+    type: Number 
+  },
+  feedback: { 
+    type: String 
+  }
+});
+
+// Création et export des modèles
+const User = mongoose.model('User', UserSchema);
+const Assessment = mongoose.model('Assessment', AssessmentSchema);
+const Question = mongoose.model('Question', QuestionSchema);
+const StudentAssessment = mongoose.model('StudentAssessment', StudentAssessmentSchema);
+const StudentAnswer = mongoose.model('StudentAnswer', StudentAnswerSchema);
+
+// Exemple d'utilisation pour la connexion à MongoDB
+/*
+async function connectToDatabase() {
+  try {
+    await mongoose.connect('mongodb://localhost:27017/evaluation_platform', {
+      useNewUrlParser: true,
+      useUnifiedTopology: true
+    });
+    console.log('Connecté à la base de données MongoDB');
+  } catch (error) {
+    console.error('Erreur de connexion à MongoDB:', error);
+  }
+}
+*/
+
+module.exports = {
+  User,
+  Assessment,
+  Question,
+  StudentAssessment,
+  StudentAnswer,
+  UserRole,
+  QuestionType,
+  AssessmentStatus
+};
