@@ -1,9 +1,7 @@
 /**
  * Service pour le modèle StudentAssessment
  */
-const StudentAssessment = require("../models/StudentAssessment")
-const { v4: uuidv4 } = require("uuid") // Vous devrez installer cette dépendance
-
+const StudentAssessment = require("../models/student.assessment")
 /**
  * Récupère toutes les assignations d'évaluations
  */

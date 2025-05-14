@@ -6,7 +6,7 @@ const { UserRole } = require("../models/constants/enums")
 
 // Schéma pour la création d'un utilisateur
 const createUserSchema = Joi.object({
-  username: Joi.string().required().messages({
+  userName: Joi.string().required().messages({
     "string.empty": "Username is required",
   }),
   password: Joi.string().min(6).required().messages({
