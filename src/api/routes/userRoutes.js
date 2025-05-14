@@ -54,7 +54,47 @@ router.get("/:id", userController.getOne)
 
 router.post("/", validateRequest(userValidation.createUserSchema), userController.create)
 
-
+/**
+ * @swagger
+ * /user/{id}:
+ *   put:
+ *     summary: Met  jour un utilisateur
+ *     description: Met  jour un utilisateur
+ *     parameters:
+ *       - name: id
+ *         in: path
+ *         required: true
+ *         description: L'ID de l'utilisateur
+ *         schema:
+ *           type: string
+ *     requestBody:
+ *       required: true
+ *       content:
+ *         application/json:
+ *           schema:
+ *             type: object
+ *             properties:
+ *               fullName:
+ *                 type: string
+ *                 description: Le nom complet de l'utilisateur
+ *               username:
+ *                 type: string
+ *                 description: Le nom d'utilisateur
+ *               email:
+ *                 type: string
+ *                 description: L'adresse email de l'utilisateur
+ *               password:
+ *                 type: string
+ *                 description: Le mot de passe de l'utilisateur
+ *               role:
+ *                 type: string
+ *                 enum: [user, teacher, admin]
+ *                 description: Le r le de l'utilisateur
+ *               class:
+ *                 type: string
+ *                 description: La classe de l'utilisateur
+ *
+ */
 router.put("/:id", validateRequest(userValidation.updateUserSchema), userController.update)
 router.delete("/:id", userController.remove)
 router.get("/email/:email", userController.getByEmail)
