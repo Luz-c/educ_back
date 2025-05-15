@@ -15,10 +15,10 @@ const login = async (req, res) => {
 //Post Register
 const register = async (req, res) => {
     try {
-        const { userName, password, email } = req.body;
-        const result = await UserService.register({ userName, password, email });
-        res.status(200).json(result);
+        const result = await UserService.register(req.body);
+        res.status(201).json(result);
     } catch (error) {
+        console.log('message:', error);
         res.status(400).json({ message: error.message });
     }
 };

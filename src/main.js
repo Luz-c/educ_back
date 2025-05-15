@@ -42,6 +42,8 @@ const options = {
 const specs = swaggerJSDoc(options);
 app.use('/api-docs', swaggerUi.serve, swaggerUi.setup(specs));
 
+// Routes
+app.use('/api/auth', require('./api/routes/auth.route'));
 app.use('/api/assessment', require('./api/routes/assessmentRoutes'));
 app.use('/api/user', require('./api/routes/userRoutes'));
 app.use('/api/student-assessment', require('./api/routes/studentAssessmentRoutes'));

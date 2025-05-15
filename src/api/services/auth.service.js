@@ -9,7 +9,7 @@ const getByEmail =  async (email) => {
 
 const getByUsername = async (username) => {
     const user = await UserModel.findOne({username});
-    return admin
+    return user;
 }
 
 const generateToken = (id, email) => {
@@ -33,16 +33,22 @@ const login = async (data) => {
 
 
 const register = async (data) => {
-    const emailExist = await getByEmail(data.email);
-    const usernameExist = await getByUsername(data.username);
-    if(emailExist) {
-        throw new Error('Email already exist')
+    try {
+        console.log(data);
+        const emailExist = await getByEmail(data.email);
+        const usernameExist = await getByUsername(data.username);
+        if(emailExist) {
+            throw new Error('Email already exist')
+        }
+        if(usernameExist) {
+            throw new Error('Username already exist')
+        }
+        const user = await UserModel.create(data);
+        return user
+    } catch (error) {
+        console.log('message:', error);
+        throw error;
     }
-    if(usernameExist) {
-        throw new Error('Username already exist')
-    }
-    const user = await UserModel.create(data);
-    return user
 }
 
 const forgetPassword = (data) => {}

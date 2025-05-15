@@ -29,13 +29,14 @@ const userSchema = new Schema(
         },
         role: {
             type: String,
-            required: false
+            enum: ['user', 'teacher', 'admin'],
+            default: 'user',
+            required: true
         },
     },
     {
         timestamps: true
     }
-
 );
 
 userSchema.pre("save", function(next){
@@ -43,8 +44,12 @@ userSchema.pre("save", function(next){
     if(!user.isModified('password')){
         return next();
     }
-const hash = hashPassword(user.password)
-user.password = hash
+    try {
+        user.password = hashPassword(user.password);
+        next();
+    } catch (error) {
+        next(error);
+    }
 
 })
 
